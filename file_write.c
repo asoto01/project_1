@@ -32,17 +32,53 @@ static char *CompressBinary(char buff[]) {
 	}
 	return stringReturn;
 }
+
+void compressBi(char *A, int size);
+
 int main() {
 	FILE *fp;
 	char buff[255];
 
 	fp = fopen("./tmp/test1.txt", "r+");
 	fscanf(fp, "%s",buff);
+	int size = sizeof(buff) / sizeof(*buff);
+	char returnedString[255];
+	memcpy(returnedString, buff, size * sizeof(char));
 	printf("%s\n", buff);
 	printf("test\n");
-	char *returnedString;
-	returnedString = CompressBinary(buff);
+//	returnedString = CompressBinary(buff);
 	printf("%s\n", returnedString);
+	compressBi(returnedString, size);
 
 	return 0;
 }
+
+void compressBi(char *A, int size) {
+	int i = 0;
+	int count0 = 0; // represents the amount of 0 counts.
+	int count1 = 0; // represents the amount of 1 counts.
+	char *stringReturn = "Nah, man";
+	while (i != strlen(A)) {
+		if(A[i] == '0') 
+			count0++;
+		else if (A[i] == '1')
+			count1++;
+		if (count0 > 0 && count1 > 0) { 
+			if (count0 >= 16) {
+				printf("-%d-\n",count0);
+
+			// printf("%d\n", count0);
+			//snprintf(localString, sizeof(localString), "-%d-", count0);
+			//printf("%s\n", localString);
+			//stringReturn = "HELLO";
+			}	
+			count0 = 0;
+		}	else if (count1 > 0 && count0 > 0) {
+			if (count1 >= 16) {
+			printf("%d\n",count1);
+			}
+			count1 = 0;
+		}
+		i++;
+	}
+}	
