@@ -1,39 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-//sample string 00000000000000001; length = 17; maxIndex = 16;output should be -16-1
-static char *CompressBinary(char buff[]) {
-	int i = 0;
-	int count0 = 0, count1 = 0;
-	char localString[strlen(buff)];
-	char *stringReturn = "Nah, man";
-	while (i != strlen(buff)) {
-		if(buff[i] == '0') 
-			count0++;
-		else if (buff[i] == '1')
-			count1++;
-		if (count0 > 0 && count1 > 0) { 
-			if (count0 >= 16) {
-				printf("%d\n",count0);
-
-			// printf("%d\n", count0);
-			//snprintf(localString, sizeof(localString), "-%d-", count0);
-			//printf("%s\n", localString);
-			//stringReturn = "HELLO";
-			}	
-			count0 = 0;
-		}	else if (count1 > 0 && count0 > 0) {
-			if (count1 >= 16) {
-			printf("%d\n",count1);
-			}
-			count1 = 0;
-		}
-		i++;
-	}
-	return stringReturn;
-}
-
-void compressBi(char *A, int size);
+//sample string in ./tmp/test1.txt is 00000000000000001; length = 17; maxIndex = 16;output should be -16-1
+void compress(char *A, int size);
 
 int main() {
 	FILE *fp;
@@ -42,43 +11,76 @@ int main() {
 	fp = fopen("./tmp/test1.txt", "r+");
 	fscanf(fp, "%s",buff);
 	int size = sizeof(buff) / sizeof(*buff);
-	char returnedString[255];
-	memcpy(returnedString, buff, size * sizeof(char));
-	printf("%s\n", buff);
-	printf("test\n");
-//	returnedString = CompressBinary(buff);
-	printf("%s\n", returnedString);
-	compressBi(returnedString, size);
-
+	char A[size];
+	memcpy(A, buff, size * sizeof(char));
+	printf("Orignal array from fscanf: %s\n", buff);
+	printf("Copied array: %s\n", A);
+	compress(A, size);
+	printf("Compressed array: %s\n", A);
 	return 0;
 }
 
-void compressBi(char *A, int size) {
-	int i = 0;
-	int count0 = 0; // represents the amount of 0 counts.
-	int count1 = 0; // represents the amount of 1 counts.
-	char *stringReturn = "Nah, man";
-	while (i != strlen(A)) {
-		if(A[i] == '0') 
+void compress(char *A, int size) {
+	int index = 0; // used for while loop targeting *A
+	int count0 = 0; // used for counting 0s
+	int count1 = 0; // used for counting 1s
+	char A1[size]; // local array
+	// loop through array, terminates when detects null character
+	while (A[index] != '\0') {
+		// counts 1s or 0s in array
+		if (A[index] == '0') {
 			count0++;
-		else if (A[i] == '1')
+		} else if (A[index] == '1') {
 			count1++;
-		if (count0 > 0 && count1 > 0) { 
-			if (count0 >= 16) {
-				printf("-%d-\n",count0);
-
-			// printf("%d\n", count0);
-			//snprintf(localString, sizeof(localString), "-%d-", count0);
-			//printf("%s\n", localString);
-			//stringReturn = "HELLO";
-			}	
-			count0 = 0;
-		}	else if (count1 > 0 && count0 > 0) {
-			if (count1 >= 16) {
-			printf("%d\n",count1);
-			}
-			count1 = 0;
 		}
-		i++;
+		// check for every time that a series is broken
+		if (count0 > 0 && count1 > 0) {
+			if (count0 >= 16) {
+				char str[12];                 
+				sprintf(str, "-%d-", count0); 
+				strcat(A1, str);    
+				count0 = 0;
+			} else if (count1 >= 16) {
+				char str[12];
+				sprintf(str, "-%d-", count1);
+				strcat(A1, str);
+				count1 = 0;
+			} else {
+				if (A[index] == '0'){
+					char str[count1];
+					for (int i = 0; i < count1; i++) {
+						str[i] = 1;
+						strcat(A1, str);
+						count1 = 0;
+					}
+				} else {
+					if (A[index] == '1'){
+						char str[count0];
+						for (int i = 0; i < count0; i++) {
+						str[i] = 0;
+						strcat(A1, str);
+						count0 = 0;
+						}
+					}
+				}
+			}
+		}
+		index++;
 	}
-}	
+	if (count0 > 0) {
+		char str[count0];
+		for (int i = 0; i < count0; i++) {
+			str[i] = '0';
+		}
+		str[count0] = '\0';
+		strcat(A1, str);
+	} else if (count1 > 0) {
+		char str[count1];
+		for (int i = 0; i < count1; i++) {
+			str[i] = '1';
+		}	
+		str[count1] = '\0';
+		strcat(A1, str);
+	}
+	memcpy(A, A1, size * sizeof(char));
+}
