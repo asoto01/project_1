@@ -6,37 +6,24 @@ void compress(char *A, int size);
 int main() {
 	FILE *fp;
 	char buff[255];
-
-	fp = fopen("./tmp/test2.txt", "r+");
-	fgets(buff, 255, (FILE*)fp);
 	int size = sizeof(buff) / sizeof(*buff);
-	char A[size];
-	memcpy(A, buff, size * sizeof(char));
-	printf("Orignal array from fgets: %s\n", buff);
-	printf("Copied array: %s\n", A);
-	compress(A, size);
-	printf("Compressed array: %s\n", A);
-	printf("\n");
-	fgets(buff, 255, (FILE*)fp);
-	size = sizeof(buff) / sizeof(*buff);
-	char A1[size];
-	memcpy(A1, buff, size * sizeof(char));
-	printf("Second array from fgets: %s\n", buff);
-	printf("Copied array: %s\n", A1);
-	compress(A1, size);
-	printf("Compressed array: %s\n", A1);
-	printf("\n");
-	fgets(buff, 255, (FILE*)fp);
-	size = sizeof(buff) / sizeof(*buff);
-	char A2[size];
-	memcpy(A2, buff, size * sizeof(char));
-	printf("Third array from fgets: %s\n", buff);
-	printf("Copied array: %s\n", A2);
-	compress(A2, size);
-	printf("Compressed array: %s\n", A2);
-	fclose(fp);
+	fp = fopen("./tmp/test2.txt", "r+");
+	if (fp) {
+		while (fgets(buff, 255, fp)) {
+			 char A[size];
+			 memcpy(A, buff, size * sizeof(char));
+			 printf("Orignal array from fgets: %s\n", buff);
+			 printf("Copied array: %s\n", A);
+			 compress(A, size);
+			 printf("Compressed array: %s\n", A);
+			printf("\n");
+		}
+		fclose(fp);
+	}
 	return 0;
 }
+
+
 
 void compress(char *A, int size) {
 	int index = 0; // used for while loop targeting *A
